@@ -1,0 +1,45 @@
+@startuml
+
+title TicketDesk - Domain Model
+left to right direction
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+class User {
+    id
+    name
+    email
+    role
+}
+
+class Ticket {
+    id
+    title
+    description
+    status
+    priority
+    version
+}
+
+class Comment {
+    id
+    message
+}
+
+class Attachment {
+    id
+    fileName
+    fileType
+    filePath
+}
+
+User "1" -- "0..*" Ticket : creates
+User "0..1" -- "0..*" Ticket : assigned supporter
+
+Ticket "1" -- "0..*" Comment : has
+User "1" -- "0..*" Comment : writes
+Ticket "1" -- "0..*" Attachment : has
+
+@enduml

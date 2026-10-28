@@ -1,0 +1,40 @@
+@baseUrl = http://localhost:7070
+@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaWNrZXRTeXN0ZW0iLCJzdWIiOiIxIiwiZXhwIjoxNzkzMDA3NDA5LCJyb2xlcyI6IlVTRVIiLCJ1c2VybmFtZSI6IjEifQ.YF6ppvyXAN3oQewDz7PJijYIsJMBvxDSi8onK6clRPw
+### Opret en demo-bruger (forvent 201; 409 hvis e-mailen findes)
+# Brug kun dette demonstrationspassword til denne bruger.
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Demo User",
+  "email": "ticketdesk-demo@example.com",
+  "password": "Demo-Only-Password-2026!"
+}
+
+### Log ind (forvent 200), og kopiér token fra svaret til variablen ovenfor
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ticketdesk-demo@example.com",
+  "password": "Demo-Only-Password-2026!"
+}
+
+### Hent egne tickets med token (forventet 200)
+GET {{baseUrl}}/api/tickets
+Authorization: Bearer {{token}}
+
+### Samme request uden token (forventet 401)
+GET {{baseUrl}}/api/tickets
+
+### Opret en ticket
+POST {{baseUrl}}/api/tickets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Kan ikke logge ind",
+  "description": "Jeg får en fejl, når jeg prøver at logge ind.",
+  "status": "OPEN",
+  "priority": "MEDIUM"
+}

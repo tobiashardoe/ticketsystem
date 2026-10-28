@@ -1,0 +1,59 @@
+@startuml TicketDesk_ER_Diagram
+
+title TicketDesk – ER-diagram
+left to right direction
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam linetype ortho
+skinparam ArrowColor #52606D
+skinparam EntityBorderColor #52606D
+skinparam EntityBackgroundColor #F8FAFC
+skinparam EntityFontColor #172B4D
+
+entity "users" as users {
+    id
+    --
+    name
+    email
+    role
+}
+
+entity "tickets" as tickets {
+    id
+    --
+    createdById
+    assignedToId
+    title
+    description
+    status
+    priority
+    version
+}
+
+entity "comments" as comments {
+    id
+    --
+    ticketId
+    authorId
+    message
+}
+
+entity "attachments" as attachments {
+    id
+    --
+    ticketId
+    fileName
+    fileType
+    filePath
+}
+
+users ||--o{ tickets : createdBy
+users |o--o{ tickets : assignedTo
+
+tickets ||--o{ comments : ticket
+users ||--o{ comments : author
+tickets ||--o{ attachments : ticket
+
+
+@enduml
