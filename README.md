@@ -14,10 +14,10 @@ Deployed application (optional):
 Ikke tilgængelig endnu.
 
 Source code repository:  
-Link tilføjes.
+https://github.com/tobiashardoe/ticketsystem
 
 Portfolio website:  
-Link tilføjes.
+tobiashardoe.github.io/Portfolio/
 
 ---
 

@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:7070
-@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaWNrZXRTeXN0ZW0iLCJzdWIiOiIxIiwiZXhwIjoxNzkzMDA3NDA5LCJyb2xlcyI6IlVTRVIiLCJ1c2VybmFtZSI6IjEifQ.YF6ppvyXAN3oQewDz7PJijYIsJMBvxDSi8onK6clRPw
+@token = indsæt token her
 ### Opret en demo-bruger (forvent 201; 409 hvis e-mailen findes)
 # Brug kun dette demonstrationspassword til denne bruger.
 POST {{baseUrl}}/api/auth/register
