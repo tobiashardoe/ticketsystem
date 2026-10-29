@@ -296,116 +296,24 @@ Response: `204 No Content` uden body.
 
 # Development Notes
 
-## Lokal opstart
+## Build og tests
 
-Brug JDK 17 eller nyere til programmet. Maven-testene bruger JUnit 6, som kræver JDK 17 eller nyere.
-Opret PostgreSQL-databasen `ticketsystem`, og giv databasebrugeren rettigheder
-til at oprette og ændre projektets tabeller.
+- `mvn clean package` bygger den kørbare fil `target/ticketsystem.jar`.
+- `mvn test` kører testene. Docker Desktop skal være startet, da testene bruger
+  separate PostgreSQL-containere og ikke onlinedatabasen.
 
-Uden miljøvariablen `DEPLOYED` læses databasen fra
-`src/main/resources/config.properties`:
+Rest Assured og Hamcrest bruges til HTTP-tests med Given–When–Then-beskrivelser. 
+Ticket-testene bruger faste IP-resultater; det eksterne API-kald og samtidigheden
+er ikke automatisk testet.
 
-```properties
-CONNECTION_STR=jdbc:postgresql://localhost:5432/
-DB_NAME=ticketsystem
-DB_USERNAME=DIN_DATABASEBRUGER
-DB_PASSWORD=DIT_DATABASEPASSWORD
-JWT_SECRET=DIN_TILFAELDIGE_HEMMELIGE_NOEGLE
-```
-
-Vælg serveradressen i CONNECTION_STR, hvis databasen ligger på en anden maskine.
-Adressen skal slutte med `/`, da DB_NAME tilføjes af koden.
-JWT_SECRET skal være en tilfældigt genereret hemmelighed på mindst 32 UTF-8-bytes,
-ikke teksten fra eksemplet. En miljøvariabel med JWT_SECRET har forrang over filen.
-
-Hvis DEPLOYED er sat (også hvis teksten er `false`), læses DB_NAME, CONNECTION_STR,
-DB_USERNAME, DB_PASSWORD og JWT_SECRET fra miljøvariabler i stedet.
-
-Indstil desuden miljøvariablen ABUSEIPDB_API_KEY til de eksterne IP-opslag.
-Valgfrit kan ADMIN_EMAIL og ADMIN_PASSWORD oprette den første administrator
-ved opstart, hvis e-mailen ikke findes. Passwordet skal være mindst otte tegn og højst
-72 UTF-8-bytes. Der er ingen standardadministrator eller standardadgangskode.
-
-Kør `app.Main` i IntelliJ. API'et kører på `http://localhost:7070/api`. Registrering og login er offentlige;
-øvrige endpoints kræver JWT. Der er ingen frontend eller health-route.
-
-Hibernate bruger `update`, ikke `create`: opstart genskaber ikke tabellerne.
-Det er ikke et migrationsværktøj; gamle kolonner fjernes ikke automatisk.
-Onlinedatabasen har en ældre version-kolonne, som ikke længere er mappet i Java.
-Den har fået standardværdien 0, så nye tickets kan gemmes. Diagrammerne viser
-modellens nuværende felter; der bruges ikke optimistisk låsning med @Version.
-
-config.properties er ignoreret af Git og udelukkes fra JAR-filerne.
-Den kan stadig ligge i target/classes ved lokal udvikling; del ikke denne mappe
-eller medtag den i Docker-images med rigtige hemmeligheder.
-Del aldrig passwords, API-nøgler eller JWT-hemmeligheder i repository eller screenshots.
-
-## Build
-
-Byg med Docker Desktop startet, så integrationstestene kan køre:
-
-```bash
-mvn clean package
-```
-
-Maven Shade Plugin 3.6.1 samler kode og biblioteker i `target/ticketsystem.jar`
-med `app.Main` som startklasse. Brug denne fil til deployment, ikke
-`original-ticketsystem.jar`. På serveren skal DEPLOYED og de nødvendige
-miljøvariabler være sat, før programmet startes med `java -jar ticketsystem.jar`.
-
-## Deployment
-
-Applikationen er manuelt deployet på en DigitalOcean-droplet. JAR-filen overføres
-med scp og ligger sammen med Dockerfile og en lokal .env-fil i
-`~/deployment/ticketsystem`. Docker-imaget bruger `eclipse-temurin:21-jre`.
-Containeren hedder ticketsystem og bruger port 7070 internt på
-Docker-netværket deployment_default. PostgreSQL kører i containeren db.
-
-Den eksisterende Caddyfile sender trafikken fra ticketsystem.tobiashardo.dk
-til ticketsystem:7070 og håndterer HTTPS. Miljøfilen indeholder DEPLOYED,
-CONNECTION_STR, DB_NAME, DB_USERNAME, DB_PASSWORD, JWT_SECRET og ABUSEIPDB_API_KEY.
-CONNECTION_STR er `jdbc:postgresql://db:5432/`, og DB_NAME er ticketsystem.
-Hemmelighederne ligger på serveren, ikke i JAR-filen. Deployment er manuelt;
-GitHub Actions og automatisk udrulning er ikke sat op.
-
-## Tests
-
-Start Docker Desktop, og kør:
-
-```bash
-mvn test
-```
-
-Testene bruger separate PostgreSQL-containere og ikke den konfigurerede onlinedatabase.
-Suite: 8 DAO-tests, 1 JSON/DTO-test, 7 user/security-tests og 10 ticket-tests:
-i alt 26, herunder tre WebSocket-tests.
-
-Route-testene bruger Rest Assured og Hamcrest med Given–When–Then-beskrivelser i
-@DisplayName. De tester blandt andet login, CRUD, IP-afvisning og roller:
-USER kan ikke tildele tickets, SUPPORT/ADMIN kan, og kun ADMIN kan oprette supportere.
-Ticket-testene bruger faste IP-resultater i stedet for rigtige AbuseIPDB-kald.
-Det eksterne kald og samtidigheden i checkMultiple er ikke automatisk testet.
-
+Login, CRUD og centrale roller er manuelt afprøvet online.
 WebSocket er manuelt afprøvet på den deployede backend. En supporter blev
 godkendt med JWT i Chrome og modtog `TICKET_CREATED` med korrekt ticket-ID,
 da en ticket blev oprettet gennem HTTP-filen i IntelliJ.
 
-Online er login og ticket-CRUD afprøvet gennem HTTP-filen. USER blev afvist
-ved tildeling med 403. ADMIN kunne oprette en supporter, SUPPORT kunne tildele
-sig selv en ticket, og SUPPORT blev afvist ved oprettelse af andre supportere.
-HTTP-filen bruger demonstrationsdata; indsæt eget token og de aktuelle ID'er
-lokalt, og fjern tokenet før commit.
-
 ## Afgrænsning
 
-IP-kontrollen læser forbindelsens adresse med getRemoteAddr(), ikke den oprindelige
-klient-IP fra Caddys videresendte headers. Oprettelse er afprøvet online, men det
-beviser ikke, at den besøgendes offentlige IP kontrolleres. Korrekt klient-IP bag
-proxyen er derfor en kendt begrænsning. Lokale/private adresser kan påvirke opslaget.
-
-Der er endnu ingen frontend, offline-notifikationer, passwordreset eller token-refresh.
-Sletning af refererede data kan give en databasefejl; de konkrete API-begrænsninger
-er beskrevet i [API-dokumentationen](docs/api.md).
-
-Navnet TicketDesk i Maven og mappen ResolveDesk er tekniske rester af tidligere navne.
-JWT-udstedernavnet er TicketSystem.
+IP-kontrollen læser forbindelsens adresse, ikke den oprindelige klient-IP bag Caddy.
+Det er en kendt begrænsning. Der er ingen frontend, offline-notifikationer,
+passwordreset eller token-refresh. Sletning af en ticket med kommentarer eller
+attachments kan give en databasefejl; se [API-dokumentationen](docs/api.md).
