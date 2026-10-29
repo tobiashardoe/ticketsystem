@@ -1,14 +1,14 @@
 @baseUrl = https://ticketsystem.tobiashardo.dk
-@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaWNrZXRTeXN0ZW0iLCJzdWIiOiIzIiwiZXhwIjoxNzkzMjcyMTE2LCJyb2xlcyI6IlNVUFBPUlQiLCJ1c2VybmFtZSI6IjMifQ.HkC716C_Ygmfp_YmSACqAPEMP1NA1vg_dwA9Gya-zuc
+@token = indsæt token her
 ### Opret en demo-bruger (forvent 201; 409 hvis e-mailen findes)
 # Brug kun dette demonstrationspassword til denne bruger.
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Demo User",
-  "email": "ticketdesk-demo@example.com",
-  "password": "Demo-Only-Password-2026!"
+  "name": "Demo Admin",
+  "email": "ticketdesk-admin@example.com",
+  "password": "DemoAdmin-Only-Password-2026!"
 }
 
 ### Log ind (forvent 200), og kopiér token fra svaret til variablen ovenfor
@@ -59,6 +59,15 @@ Authorization: Bearer {{token}}
 DELETE {{baseUrl}}/api/tickets/3
 Authorization: Bearer {{token}}
 
+### Log ind på ADMIN (forvent 200), og kopiér token fra svaret til variablen ovenfor
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ticketdesk-admin@example.com",
+  "password": "DemoAdmin-Only-Password-2026!"
+}
+
 ### ADMIN opretter en supporter (forvent 201)
 POST {{baseUrl}}/api/supporters
 Authorization: Bearer {{token}}
@@ -70,7 +79,7 @@ Content-Type: application/json
   "password": "Demo-Support-2026!"
 }
 
-### Log ind (forvent 200), og kopiér token fra svaret til variablen ovenfor
+### Log ind på SUPPORT(forvent 200), og kopiér token fra svaret til variablen ovenfor
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 

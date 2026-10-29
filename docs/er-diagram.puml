@@ -1,6 +1,6 @@
-@startuml TicketDesk_ER_Diagram
+@startuml TicketSystem_ER_Diagram
 
-title TicketDesk – ER-diagram
+title TicketSystem – ER-diagram
 left to right direction
 
 skinparam backgroundColor #FFFFFF
@@ -17,32 +17,32 @@ entity "users" as users {
     name
     email
     role
+    passwordHash
 }
 
 entity "tickets" as tickets {
     id
     --
-    createdById
-    assignedToId
+    created_by_id
+    assigned_to_id
     title
     description
     status
     priority
-    version
 }
 
 entity "comments" as comments {
     id
     --
-    ticketId
-    authorId
+    ticket_id
+    author_id
     message
 }
 
 entity "attachments" as attachments {
     id
     --
-    ticketId
+    ticket_id
     fileName
     fileType
     filePath

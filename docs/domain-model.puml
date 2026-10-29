@@ -1,6 +1,6 @@
 @startuml
 
-title TicketDesk - Domain Model
+title TicketSystem - Domain Model
 left to right direction
 
 skinparam shadowing false
@@ -20,7 +20,6 @@ class Ticket {
     description
     status
     priority
-    version
 }
 
 class Comment {

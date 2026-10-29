@@ -3,7 +3,8 @@
 API'et bruges til at oprette og behandle supporttickets.
 Her vises alle 12 REST-endpoints, tre uddybede eksempler og tre fejlscenarier.
 
-Baseadresse: `http://localhost:7070/api`
+Lokal baseadresse: `http://localhost:7070/api`
+Online baseadresse: `https://ticketsystem.tobiashardo.dk/api`
 
 ## Endpoints
 
@@ -219,10 +220,15 @@ databasereferencer; der er ikke automatisk cascading. Uventede serverfejl giver
 
 ## WebSockets
 
-Adressen er `ws://localhost:7070/ws/tickets`. Klienten sender sit JWT som første
+Lokalt bruges `ws://localhost:7070/ws/tickets` og online
+`wss://ticketsystem.tobiashardo.dk/ws/tickets`. Klienten sender sit JWT som første
 tekstbesked uden `Bearer`. Ved godkendelse svarer serveren med `CONNECTED`;
 et ugyldigt token lukker forbindelsen med kode 1008.
 
 SUPPORT og ADMIN får besked om nye tickets. Ejeren og SUPPORT/ADMIN får besked
 om ændringer, tildeling, kommentarer og sletning. Beskederne indeholder `type`
 og `ticketId` og sendes kun til tilsluttede klienter.
+
+IP-kontrollen bruger forbindelsens adresse (`getRemoteAddr()`). Bag Caddy er
+kontrol af den oprindelige besøgendes IP ikke verificeret; videresendte IP-headers
+bruges ikke af den nuværende kode.

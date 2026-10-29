@@ -11,13 +11,15 @@ tildeling i ét system med adgang baseret på brugerens rolle.
 ## Links
 
 Deployed application (optional):  
-https://ticketsystem.tobiashardo.dk/
+[TicketSystem API](https://ticketsystem.tobiashardo.dk/api/tickets)
+
+Beskyttede endpoints svarer 401 uden JWT. Der er ingen login-side eller frontend.
 
 Source code repository:  
-https://github.com/tobiashardoe/ticketsystem
+[GitHub-repository](https://github.com/tobiashardoe/ticketsystem)
 
 Portfolio website:  
-tobiashardoe.github.io/Portfolio/
+[Portfolio](https://tobiashardoe.github.io/Portfolio/)
 
 ---
 
@@ -36,7 +38,7 @@ Teknologier og versioner fra `pom.xml` og testopsætningen:
 
 | Teknologi | Version |
 |---|---|
-| Java | 17 (source/target i Maven) |
+| Java | 17 (release i Maven), Java 21 i deployment |
 | Javalin | 6.5.0 |
 | Hibernate ORM (JPA) | 7.2.3.Final |
 | PostgreSQL JDBC-driver | 42.7.7 |
@@ -155,7 +157,8 @@ Relationerne er mappet fra ticketen eller kommentaren med ManyToOne.
 
 API'et har 12 REST-endpoints og én separat WebSocket-forbindelse.
 
-Baseadresse: `http://localhost:7070/api`.
+Lokal baseadresse: `http://localhost:7070/api`.
+Online baseadresse: `https://ticketsystem.tobiashardo.dk/api`.
 Disse seks endpoints viser login og det centrale forløb fra oprettelse til behandling af en ticket.
 
 Alle undtagen login kræver `Authorization: Bearer <token>`.
@@ -328,7 +331,9 @@ Kør `app.Main` i IntelliJ. API'et kører på `http://localhost:7070/api`. Regis
 
 Hibernate bruger `update`, ikke `create`: opstart genskaber ikke tabellerne.
 Det er ikke et migrationsværktøj; gamle kolonner fjernes ikke automatisk.
-Kontrollér især den gamle version-kolonne, hvis databasen tidligere brugte @Version.
+Onlinedatabasen har en ældre version-kolonne, som ikke længere er mappet i Java.
+Den har fået standardværdien 0, så nye tickets kan gemmes. Diagrammerne viser
+modellens nuværende felter; der bruges ikke optimistisk låsning med @Version.
 
 config.properties er ignoreret af Git og udelukkes fra JAR-filerne.
 Den kan stadig ligge i target/classes ved lokal udvikling; del ikke denne mappe
@@ -348,6 +353,21 @@ med `app.Main` som startklasse. Brug denne fil til deployment, ikke
 `original-ticketsystem.jar`. På serveren skal DEPLOYED og de nødvendige
 miljøvariabler være sat, før programmet startes med `java -jar ticketsystem.jar`.
 
+## Deployment
+
+Applikationen er manuelt deployet på en DigitalOcean-droplet. JAR-filen overføres
+med scp og ligger sammen med Dockerfile og en lokal .env-fil i
+`~/deployment/ticketsystem`. Docker-imaget bruger `eclipse-temurin:21-jre`.
+Containeren hedder ticketsystem og bruger port 7070 internt på
+Docker-netværket deployment_default. PostgreSQL kører i containeren db.
+
+Den eksisterende Caddyfile sender trafikken fra ticketsystem.tobiashardo.dk
+til ticketsystem:7070 og håndterer HTTPS. Miljøfilen indeholder DEPLOYED,
+CONNECTION_STR, DB_NAME, DB_USERNAME, DB_PASSWORD, JWT_SECRET og ABUSEIPDB_API_KEY.
+CONNECTION_STR er `jdbc:postgresql://db:5432/`, og DB_NAME er ticketsystem.
+Hemmelighederne ligger på serveren, ikke i JAR-filen. Deployment er manuelt;
+GitHub Actions og automatisk udrulning er ikke sat op.
+
 ## Tests
 
 Start Docker Desktop, og kør:
@@ -366,18 +386,22 @@ USER kan ikke tildele tickets, SUPPORT/ADMIN kan, og kun ADMIN kan oprette suppo
 Ticket-testene bruger faste IP-resultater i stedet for rigtige AbuseIPDB-kald.
 Det eksterne kald og samtidigheden i checkMultiple er ikke automatisk testet.
 
-WebSocket er manuelt afprøvet på den deployede backend. En supporter blev 
-godkendt med JWT i Chrome og modtog TICKET_CREATED med korrekt ticket-ID, 
+WebSocket er manuelt afprøvet på den deployede backend. En supporter blev
+godkendt med JWT i Chrome og modtog `TICKET_CREATED` med korrekt ticket-ID,
 da en ticket blev oprettet gennem HTTP-filen i IntelliJ.
+
+Online er login og ticket-CRUD afprøvet gennem HTTP-filen. USER blev afvist
+ved tildeling med 403. ADMIN kunne oprette en supporter, SUPPORT kunne tildele
+sig selv en ticket, og SUPPORT blev afvist ved oprettelse af andre supportere.
+HTTP-filen bruger demonstrationsdata; indsæt eget token og de aktuelle ID'er
+lokalt, og fjern tokenet før commit.
 
 ## Afgrænsning
 
-Deployment er endnu ikke færdiggjort. Domæne og database på en server betyder ikke,
-at selve Java-programmet er deployet.
-
-Bag en proxy som Caddy skal klient-IP og sikker videresendelse af adressen afklares:
-koden læser forbindelsens adresse og ikke vilkårlige IP-headers fra klienten.
-Lokale/private adresser kan give fejl i AbuseIPDB-opslaget.
+IP-kontrollen læser forbindelsens adresse med getRemoteAddr(), ikke den oprindelige
+klient-IP fra Caddys videresendte headers. Oprettelse er afprøvet online, men det
+beviser ikke, at den besøgendes offentlige IP kontrolleres. Korrekt klient-IP bag
+proxyen er derfor en kendt begrænsning. Lokale/private adresser kan påvirke opslaget.
 
 Der er endnu ingen frontend, offline-notifikationer, passwordreset eller token-refresh.
 Sletning af refererede data kan give en databasefejl; de konkrete API-begrænsninger
