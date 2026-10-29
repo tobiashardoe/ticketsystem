@@ -38,7 +38,7 @@ Teknologier og versioner fra `pom.xml` og testopsætningen:
 
 | Teknologi | Version |
 |---|---|
-| Java | 17 (release i Maven), Java 21 i deployment |
+| Java | 21 (lokalt, Maven release og deployment) |
 | Javalin | 6.5.0 |
 | Hibernate ORM (JPA) | 7.2.3.Final |
 | PostgreSQL JDBC-driver | 42.7.7 |
@@ -298,7 +298,7 @@ Response: `204 No Content` uden body.
 
 ## Build og tests
 
-- `mvn clean package` bygger den kørbare fil `target/ticketsystem.jar`.
+- `mvn clean package` bygger den projektet
 - `mvn test` kører testene. Docker Desktop skal være startet, da testene bruger
   separate PostgreSQL-containere og ikke onlinedatabasen.
 
