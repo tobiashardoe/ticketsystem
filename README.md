@@ -13,7 +13,7 @@ tildeling i ét system med adgang baseret på brugerens rolle.
 Deployed application (optional):  
 [TicketSystem API](https://ticketsystem.tobiashardo.dk/api/tickets)
 
-Beskyttede endpoints svarer 401 uden JWT. Der er ingen login-side eller frontend.
+Beskyttede endpoints svarer 401 uden JWT.
 
 Source code repository:  
 [GitHub-repository](https://github.com/tobiashardoe/ticketsystem)
