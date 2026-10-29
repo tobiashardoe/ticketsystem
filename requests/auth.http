@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:7070
+@baseUrl = https://ticketsystem.tobiashardo.dk
 @token = indsæt token her
 ### Opret en demo-bruger (forvent 201; 409 hvis e-mailen findes)
 # Brug kun dette demonstrationspassword til denne bruger.
@@ -38,3 +38,47 @@ Content-Type: application/json
   "status": "OPEN",
   "priority": "MEDIUM"
 }
+
+### Opdater en ticket (forvent 200)
+PUT {{baseUrl}}/api/tickets/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Loginproblem løst",
+  "description": "Jeg kan nu logge ind igen.",
+  "status": "CLOSED",
+  "priority": "MEDIUM"
+}
+
+### USER må ikke tildele en supporter (forvent 403)
+PUT {{baseUrl}}/api/tickets/1/assign?supporterId=2
+Authorization: Bearer {{token}}
+
+### Slet en ticket (forvent 204)
+DELETE {{baseUrl}}/api/tickets/3
+Authorization: Bearer {{token}}
+
+### ADMIN opretter en supporter (forvent 201)
+POST {{baseUrl}}/api/supporters
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Demo Support",
+  "email": "support-demo@example.com",
+  "password": "Demo-Support-2026!"
+}
+
+### Log ind (forvent 200), og kopiér token fra svaret til variablen ovenfor
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "support-demo@example.com",
+  "password": "Demo-Support-2026!"
+}
+
+### ADMIN/SUPPORT tildeler supporter (forvent 200)
+PUT {{baseUrl}}/api/tickets/1/assign?supporterId=3
+Authorization: Bearer {{token}}

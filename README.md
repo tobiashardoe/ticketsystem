@@ -11,7 +11,7 @@ tildeling i ét system med adgang baseret på brugerens rolle.
 ## Links
 
 Deployed application (optional):  
-Ikke tilgængelig endnu.
+https://ticketsystem.tobiashardo.dk/
 
 Source code repository:  
 https://github.com/tobiashardoe/ticketsystem
@@ -327,9 +327,23 @@ Hibernate bruger `update`, ikke `create`: opstart genskaber ikke tabellerne.
 Det er ikke et migrationsværktøj; gamle kolonner fjernes ikke automatisk.
 Kontrollér især den gamle version-kolonne, hvis databasen tidligere brugte @Version.
 
-config.properties er ignoreret af Git, men kopieres ind i build-outputtet.
-Den må derfor ikke medtages med rigtige hemmeligheder i delte JAR-filer eller Docker-images.
+config.properties er ignoreret af Git og udelukkes fra JAR-filerne.
+Den kan stadig ligge i target/classes ved lokal udvikling; del ikke denne mappe
+eller medtag den i Docker-images med rigtige hemmeligheder.
 Del aldrig passwords, API-nøgler eller JWT-hemmeligheder i repository eller screenshots.
+
+## Build
+
+Byg med Docker Desktop startet, så integrationstestene kan køre:
+
+```bash
+mvn clean package
+```
+
+Maven Shade Plugin 3.6.1 samler kode og biblioteker i `target/ticketsystem.jar`
+med `app.Main` som startklasse. Brug denne fil til deployment, ikke
+`original-ticketsystem.jar`. På serveren skal DEPLOYED og de nødvendige
+miljøvariabler være sat, før programmet startes med `java -jar ticketsystem.jar`.
 
 ## Tests
 
