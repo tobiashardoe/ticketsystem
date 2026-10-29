@@ -363,6 +363,10 @@ USER kan ikke tildele tickets, SUPPORT/ADMIN kan, og kun ADMIN kan oprette suppo
 Ticket-testene bruger faste IP-resultater i stedet for rigtige AbuseIPDB-kald.
 Det eksterne kald og samtidigheden i checkMultiple er ikke automatisk testet.
 
+WebSocket er manuelt afprøvet på den deployede backend. En supporter blev 
+godkendt med JWT i Chrome og modtog TICKET_CREATED med korrekt ticket-ID, 
+da en ticket blev oprettet gennem HTTP-filen i IntelliJ.
+
 ## Afgrænsning
 
 Deployment er endnu ikke færdiggjort. Domæne og database på en server betyder ikke,

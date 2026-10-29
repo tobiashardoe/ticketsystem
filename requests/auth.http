@@ -1,5 +1,5 @@
 @baseUrl = https://ticketsystem.tobiashardo.dk
-@token = indsæt token her
+@token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJUaWNrZXRTeXN0ZW0iLCJzdWIiOiIzIiwiZXhwIjoxNzkzMjcyMTE2LCJyb2xlcyI6IlNVUFBPUlQiLCJ1c2VybmFtZSI6IjMifQ.HkC716C_Ygmfp_YmSACqAPEMP1NA1vg_dwA9Gya-zuc
 ### Opret en demo-bruger (forvent 201; 409 hvis e-mailen findes)
 # Brug kun dette demonstrationspassword til denne bruger.
 POST {{baseUrl}}/api/auth/register
