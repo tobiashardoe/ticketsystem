@@ -285,6 +285,9 @@ Response: `204 No Content` uden body.
 
 - Som bruger vil jeg kunne registrere mig og logge ind, så mine tickets er knyttet til mig.
 - Som bruger vil jeg kunne oprette, se, opdatere og slette mine egne tickets.
+- Som bruger vil jeg kunne læse svar og få besked om ændringer på mine tickets.
+- Som supporter vil jeg kunne se alle tickets, tildele en supporter og svare på henvendelser.
+- Som administrator vil jeg kunne oprette supportere, så de kan behandle tickets.
 
 ---
 
